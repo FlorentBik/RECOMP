@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RECOMP">
+<meta name="theme-color" content="#0A0A0A">
+<title>RECOMP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;
+  --surface:#111111;
+  --surface-2:#161616;
+  --line:rgba(255,255,255,0.06);
+  --line-2:rgba(255,255,255,0.1);
+  --text:#FAFAF7;
+  --text-2:#8B8B85;
+  --text-3:#4D4D49;
+  --text-4:#2A2A28;
+  --accent:#D4C5A0;
+  --accent-dim:rgba(212,197,160,0.08);
+  --accent-line:rgba(212,197,160,0.15);
+  --green:#7FB685;
+  --red:#C67B77;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:var(--bg);color:var(--text);font-family:'Inter Tight',-apple-system,sans-serif;overscroll-behavior:none;font-feature-settings:'ss01','cv11'}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type="number"]{-moz-appearance:textfield}
+button{font-family:inherit;-webkit-appearance:none;border:none;background:none;color:inherit;cursor:pointer}
+#root{min-height:100vh;min-height:100dvh;padding-bottom:env(safe-area-inset-bottom,24px)}
+.serif{font-family:'Fraunces',serif;font-optical-sizing:auto}
+.mono{font-family:'JetBrains Mono',monospace;font-feature-settings:'zero','ss02'}
+.eyebrow{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--text-3)}
+.label{font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3)}
+button:active{opacity:0.6;transition:opacity 0.1s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeToast{0%{opacity:0;transform:translate(-50%,8px)}15%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-8px)}}
+@keyframes dotPulse{0%,100%{opacity:0.3}50%{opacity:1}}
+.stagger-1{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.05s both}
+.stagger-2{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.12s both}
+.stagger-3{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.19s both}
+.stagger-4{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.26s both}
+.stagger-5{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.33s both}
+.stagger-6{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.4s both}
+.stagger-7{animation:fadeIn 0.5s cubic-bezier(0.22,1,0.36,1) 0.47s both}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0.012;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+var h=React.createElement,uS=React.useState,uE=React.useEffect,uR=React.useRef;
+var SK="recomp-lux-v1";
+function dbSave(d){try{localStorage.setItem(SK,JSON.stringify(d));return true}catch(e){return false}}
+function dbLoad(){try{var r=localStorage.getItem(SK);if(r)return JSON.parse(r)}catch(e){}return{w:{},water:{},fast:{}}}
+
+var DAYS=[
+  {id:"lundi",label:"Lun",name:"Upper A",sub:"Push Priority",type:"muscu",ex:[
+    {id:"ua1",name:"DB Bench Press",sets:4,reps:"6–8",cat:"Poitrine",rest:150,rl:"2:30",note:"Composé lourd"},
+    {id:"ua2",name:"Tirage Horizontal",sets:3,reps:"10–12",cat:"Dos",rest:120,rl:"2:00",note:"Composé modéré"},
+    {id:"ua3",name:"OHP Assis Haltères",sets:3,reps:"8–10",cat:"Épaules",rest:120,rl:"2:00",note:"Composé modéré"},
+    {id:"ua4",name:"Lateral Raise Poulie",sets:3,reps:"15–20",cat:"Épaules",rest:45,rl:"0:45",note:"Pump métabolique"},
+    {id:"ua5",name:"Triceps Poulie Corde",sets:3,reps:"12–15",cat:"Triceps",rest:60,rl:"1:00",note:"Isolation"},
+    {id:"ua6",name:"Hammer Curl",sets:3,reps:"10–12",cat:"Biceps",rest:60,rl:"1:00",note:"Isolation"},
+    {id:"ua7",name:"Ab Wheel",sets:3,reps:"8–10",cat:"Core",rest:60,rl:"1:00",note:"Core"}]},
+  {id:"mardi",label:"Mar",name:"Lower A",sub:"Quad Priority",type:"muscu",ex:[
+    {id:"la1",name:"Leg Press",sets:4,reps:"8–10",cat:"Quadriceps",rest:180,rl:"3:00",note:"Composé lourd"},
+    {id:"la2",name:"Bulgarian Split Squat",sets:3,reps:"10–12/côté",cat:"Quadriceps",rest:90,rl:"1:30",note:"Unilatéral"},
+    {id:"la3",name:"Leg Extension",sets:3,reps:"12–15",cat:"Quadriceps",rest:75,rl:"1:15",note:"Tempo 3-1-1"},
+    {id:"la4",name:"Prone Leg Curl",sets:3,reps:"10–12",cat:"Ischio",rest:90,rl:"1:30",note:"Isolation"},
+    {id:"la5",name:"Mollets Assis",sets:3,reps:"15–20",cat:"Mollets",rest:45,rl:"0:45",note:"Haute reps"},
+    {id:"la6",name:"Planche",sets:3,reps:"45–60s",cat:"Core",rest:60,rl:"1:00",note:"Isométrique"}]},
+  {id:"mercredi",label:"Mer",name:"HIIT",sub:"Spinning Intervals",type:"hiit",ex:[]},
+  {id:"jeudi",label:"Jeu",name:"Upper B",sub:"Pull Priority",type:"muscu",ex:[
+    {id:"ub1",name:"Lat Pulldown",sets:4,reps:"6–10",cat:"Dos",rest:150,rl:"2:30",note:"Composé lourd"},
+    {id:"ub2",name:"Incline Machine Press",sets:3,reps:"10–12",cat:"Poitrine",rest:120,rl:"2:00",note:"Composé modéré"},
+    {id:"ub3",name:"Tirage Unilatéral",sets:3,reps:"10–12",cat:"Dos",rest:90,rl:"1:30",note:"Unilatéral"},
+    {id:"ub4",name:"Dips Poids de Corps",sets:3,reps:"10–15",cat:"Poitrine",rest:120,rl:"2:00",note:"Composé"},
+    {id:"ub5",name:"Rear Delt Machine",sets:3,reps:"15–20",cat:"Épaules",rest:45,rl:"0:45",note:"Isolation"},
+    {id:"ub6",name:"Seated Incline Curl",sets:3,reps:"10–12",cat:"Biceps",rest:60,rl:"1:00",note:"Isolation"},
+    {id:"ub7",name:"Pallof Press",sets:3,reps:"12/côté",cat:"Core",rest:45,rl:"0:45",note:"Anti-rotation"}]},
+  {id:"vendredi",label:"Ven",name:"Lower B",sub:"Posterior Priority",type:"muscu",ex:[
+    {id:"lb1",name:"SDT Roumain",sets:4,reps:"8–10",cat:"Ischio/Fessiers",rest:180,rl:"3:00",note:"Composé lourd"},
+    {id:"lb2",name:"Leg Press Pieds Hauts",sets:3,reps:"12–15",cat:"Ischio",rest:120,rl:"2:00",note:"Composé modéré"},
+    {id:"lb3",name:"Seated Leg Curl",sets:3,reps:"12–15",cat:"Ischio",rest:75,rl:"1:15",note:"Isolation"},
+    {id:"lb4",name:"Leg Extension",sets:3,reps:"12–15",cat:"Quadriceps",rest:75,rl:"1:15",note:"Tempo 3-1-1"},
+    {id:"lb5",name:"Face Pull Poulie",sets:3,reps:"15–20",cat:"Épaules",rest:45,rl:"0:45",note:"Santé épaule"},
+    {id:"lb6",name:"Lateral Raise Poulie",sets:3,reps:"15–20",cat:"Épaules",rest:45,rl:"0:45",note:"Isolation"},
+    {id:"lb7",name:"Relevés Jambes",sets:3,reps:"10–12",cat:"Core",rest:60,rl:"1:00",note:"Core dynamique"}]},
+  {id:"samedi",label:"Sam",name:"Recovery",sub:"Jeûne 24h",type:"repos",ex:[]},
+  {id:"dimanche",label:"Dim",name:"Rest",sub:"Repos complet",type:"repos",ex:[]}
+];
+
+function gTd(){var d=new Date().getDay();return d===0?6:d-1}
+function gWN(){var d=new Date(),s=new Date(d.getFullYear(),0,1);return Math.ceil(((d-s)/864e5+s.getDay()+1)/7)}
+function gWI(){return"W"+gWN()+"-"+new Date().getFullYear()}
+
+function Ic(p){
+  var paths={
+    back:h("path",{d:"M15 18l-6-6 6-6"}),
+    x:h("path",{d:"M18 6L6 18M6 6l12 12"}),
+    arrow:h("path",{d:"M5 12h14m-4-4l4 4-4 4"}),
+    chart:h("path",{d:"M3 3v18h18M7 16l4-4 4 4 5-5"}),
+    plus:h("path",{d:"M12 5v14M5 12h14"}),
+    minus:h("path",{d:"M5 12h14"}),
+    check:h("path",{d:"M20 6L9 17l-5-5"}),
+    play:h("path",{d:"M5 3l14 9-14 9V3z",fill:"currentColor",stroke:"none"})
+  };
+  return h("svg",{width:p.s||16,height:p.s||16,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.5,strokeLinecap:"round",strokeLinejoin:"round",style:p.st},paths[p.i]||paths.check)
+}
+
+function Timer(p){
+  var s1=uS(false),on=s1[0],sOn=s1[1];
+  var s2=uS(p.sec),lf=s2[0],sLf=s2[1];
+  var rf=uR(null);
+  uE(function(){
+    if(on&&lf>0){rf.current=setTimeout(function(){sLf(lf-1)},1e3);return function(){clearTimeout(rf.current)}}
+    if(on&&lf===0){sOn(false);sLf(p.sec);try{navigator.vibrate([200,100,200])}catch(e){}}
+  },[on,lf,p.sec]);
+  var m=Math.floor(lf/60),s=lf%60,pc=((p.sec-lf)/p.sec)*100;
+  if(!on)return h("button",{onClick:function(){sOn(true);sLf(p.sec)},style:{display:"inline-flex",alignItems:"center",gap:8,padding:"6px 12px",border:"1px solid var(--line-2)",borderRadius:100,fontSize:11,letterSpacing:"0.05em",color:"var(--text-2)",fontFamily:"'JetBrains Mono',monospace"}},
+    h(Ic,{i:"play",s:9}),p.label);
+  return h("div",{style:{display:"flex",alignItems:"center",gap:14,padding:"10px 14px",background:"var(--accent-dim)",border:"1px solid var(--accent-line)",borderRadius:12}},
+    h("div",{className:"mono",style:{fontSize:22,fontWeight:500,color:lf<=5?"var(--red)":"var(--accent)",minWidth:54,letterSpacing:"-0.02em"}},m+":"+(s<10?"0":"")+s),
+    h("div",{style:{flex:1,height:1,background:"var(--line)",position:"relative",overflow:"hidden"}},
+      h("div",{style:{position:"absolute",inset:0,background:lf<=5?"var(--red)":"var(--accent)",width:pc+"%",transition:"width 1s linear"}})),
+    h("button",{onClick:function(){sOn(false);sLf(p.sec)},style:{color:"var(--text-3)"}},h(Ic,{i:"x",s:14})))
+}
+
+function App(){
+  var s0=uS(dbLoad),data=s0[0],setData=s0[1];
+  var s1=uS("home"),view=s1[0],setView=s1[1];
+  var s2=uS(null),selDay=s2[0],setSelDay=s2[1];
+  var s3=uS(0),wCnt=s3[0],setWCnt=s3[1];
+  var s4=uS(false),fast=s4[0],setFast=s4[1];
+  var s5=uS({}),inp=s5[0],setInp=s5[1];
+  var s6=uS(null),toast=s6[0],setToast=s6[1];
+  var s7=uS(null),hEx=s7[0],setHEx=s7[1];
+  var s8=uS("max"),chartMode=s8[0],setChartMode=s8[1];
+  var dRef=uR(data);
+  var wi=gWI(),td=gTd(),tk=wi+"-"+td;
+  uE(function(){dRef.current=data},[data]);
+  uE(function(){setWCnt(data.water&&data.water[tk]||0);setFast(data.fast&&data.fast[tk]||false)},[]);
+
+  function sav(nd){setData(nd);dRef.current=nd;dbSave(nd)}
+  function fl(m){setToast(m);setTimeout(function(){setToast(null)},1800)}
+
+  uE(function(){
+    if(view==="workout"&&selDay!==null){var day=DAYS[selDay];if(day.type!=="muscu")return;
+    var li={};day.ex.forEach(function(ex){for(var s=0;s<ex.sets;s++){var k=wi+"-"+selDay+"-"+ex.id,sv=data.w[k]&&data.w[k][s];li[ex.id+"-"+s+"-w"]=sv?sv.weight||"":"";li[ex.id+"-"+s+"-r"]=sv?sv.reps||"":""}});setInp(li)}
+  },[view,selDay]);
+
+  function gv(eid,si,f){return inp[eid+"-"+si+"-"+f]||""}
+  function sv2(eid,si,f,v){var n=Object.assign({},inp);n[eid+"-"+si+"-"+f]=v;setInp(n)}
+  function aAll(eid,num){var w=gv(eid,0,"w"),r=gv(eid,0,"r");if(!w&&!r)return;var n=Object.assign({},inp);for(var s=1;s<num;s++){n[eid+"-"+s+"-w"]=w;n[eid+"-"+s+"-r"]=r}setInp(n);fl("Appliqué à toutes les séries")}
+
+  function saveWk(di){
+    var nw=Object.assign({},dRef.current.w);
+    DAYS[di].ex.forEach(function(ex){var k=wi+"-"+di+"-"+ex.id;if(!nw[k])nw[k]={};for(var s=0;s<ex.sets;s++){var w=gv(ex.id,s,"w"),r=gv(ex.id,s,"r");if(w||r)nw[k][s]={weight:w,reps:r}}});
+    sav(Object.assign({},dRef.current,{w:nw}));fl("Séance enregistrée")
+  }
+
+  function doW(d){var n=Math.max(0,wCnt+d);setWCnt(n);var nd=Object.assign({},dRef.current,{water:Object.assign({},dRef.current.water)});nd.water[tk]=n;sav(nd)}
+  function doF(){var nv=!fast;setFast(nv);var nd=Object.assign({},dRef.current,{fast:Object.assign({},dRef.current.fast)});nd.fast[tk]=nv;sav(nd)}
+  function gP(di,eid,si){var k="W"+(gWN()-1)+"-"+new Date().getFullYear()+"-"+di+"-"+eid;return data.w[k]&&data.w[k][si]||null}
+  function gH(di,eid){var hh=[],n=gWN(),y=new Date().getFullYear();for(var w=0;w<12;w++){var k="W"+(n-w)+"-"+y+"-"+di+"-"+eid,sets=data.w[k];if(sets&&Object.keys(sets).length>0){var sa=Object.entries(sets).map(function(e){return{set:parseInt(e[0])+1,weight:e[1].weight,reps:e[1].reps}}).filter(function(s){return s.weight||s.reps});if(sa.length>0)hh.push({week:n-w,sets:sa,cur:w===0})}}return hh}
+  function isD(di){var d=DAYS[di];if(d.type!=="muscu")return false;return d.ex.every(function(ex){for(var s=0;s<ex.sets;s++){var v=data.w[wi+"-"+di+"-"+ex.id]&&data.w[wi+"-"+di+"-"+ex.id][s];if(!v||(!v.weight&&!v.reps))return false}return true})}
+  function hD(di){return!!data.w[wi+"-"+di+"-hiit"]}
+  function doH(di){var nw=Object.assign({},dRef.current.w);nw[wi+"-"+di+"-hiit"]={done:true};sav(Object.assign({},dRef.current,{w:nw}));fl("HIIT enregistré")}
+  function wp(){var c=0;DAYS.forEach(function(d,i){if(d.type==="muscu"&&isD(i))c++;if(d.type==="hiit"&&hD(i))c++});return c}
+
+  var wTgt=td===5?4:td===6?3.5:4.5,wL=wCnt*.25,wPc=Math.min(100,(wL/wTgt)*100);
+
+  function Toast(){return toast?h("div",{style:{position:"fixed",top:60,left:"50%",background:"var(--surface-2)",border:"1px solid var(--line-2)",color:"var(--text)",padding:"10px 20px",borderRadius:100,fontSize:12,letterSpacing:"0.02em",zIndex:999,animation:"fadeToast 1.8s cubic-bezier(0.22,1,0.36,1) forwards",display:"flex",alignItems:"center",gap:8}},
+    h("span",{style:{width:4,height:4,borderRadius:"50%",background:"var(--accent)"}}),toast):null}
+
+  // HISTORY — with line chart + toggle
+  if(view==="history"&&hEx){
+    var hex=hEx.ex,hist=gH(hEx.di,hex.id);
+    // hist is newest-first; reverse for chronological chart
+    var chrono=hist.slice().reverse();
+    // Build datapoints depending on mode
+    var pts=chrono.map(function(hh){
+      var maxW=Math.max.apply(null,hh.sets.map(function(s){return parseFloat(s.weight)||0}));
+      var vol=hh.sets.reduce(function(a,s){return a+(parseFloat(s.weight)||0)*(parseFloat(s.reps)||0)},0);
+      return{week:hh.week,cur:hh.cur,max:maxW,vol:vol,sets:hh.sets};
+    });
+    var vals=pts.map(function(p){return chartMode==="max"?p.max:p.vol});
+    var vMax=vals.length?Math.max.apply(null,vals):0;
+    var vMin=vals.length?Math.min.apply(null,vals):0;
+    var range=vMax-vMin||1;
+    var pad=range*0.15;
+    var yHi=vMax+pad,yLo=Math.max(0,vMin-pad),ySpan=yHi-yLo||1;
+    // SVG dims
+    var W=320,H=180,padX=8,padY=16;
+    var plotW=W-padX*2,plotH=H-padY*2;
+    function xAt(i){return pts.length<=1?W/2:padX+(i/(pts.length-1))*plotW}
+    function yAt(v){return padY+plotH-((v-yLo)/ySpan)*plotH}
+    var linePath="",areaPath="";
+    pts.forEach(function(p,i){
+      var v=chartMode==="max"?p.max:p.vol;
+      var x=xAt(i),y=yAt(v);
+      linePath+=(i===0?"M":"L")+x.toFixed(1)+" "+y.toFixed(1)+" ";
+    });
+    if(pts.length>0){
+      areaPath=linePath+"L"+xAt(pts.length-1).toFixed(1)+" "+(padY+plotH)+" L"+xAt(0).toFixed(1)+" "+(padY+plotH)+" Z";
+    }
+    var last=pts.length?(chartMode==="max"?pts[pts.length-1].max:pts[pts.length-1].vol):0;
+    var first=pts.length?(chartMode==="max"?pts[0].max:pts[0].vol):0;
+    var delta=last-first;
+    var deltaPct=first>0?Math.round((delta/first)*100):0;
+
+    return h("div",{style:{minHeight:"100vh",background:"var(--bg)",paddingBottom:40}},h(Toast),
+      h("div",{style:{padding:"24px 24px 0",position:"sticky",top:0,background:"var(--bg)",zIndex:10}},
+        h("button",{onClick:function(){setView("workout");setHEx(null)},style:{color:"var(--text-2)",padding:"4px 4px 4px 0",marginBottom:24}},h(Ic,{i:"back",s:20})),
+        h("div",{className:"eyebrow"},"Progression"),
+        h("div",{className:"serif",style:{fontSize:32,fontWeight:400,letterSpacing:"-0.03em",lineHeight:1.1,marginTop:6}},hex.name),
+        h("div",{style:{fontSize:12,color:"var(--text-3)",marginTop:8,paddingBottom:20}},pts.length+" semaine"+(pts.length>1?"s":"")+" enregistrée"+(pts.length>1?"s":""))),
+
+      pts.length===0?
+        h("div",{style:{textAlign:"center",padding:"80px 24px"}},
+          h("div",{style:{width:1,height:40,background:"var(--line)",margin:"0 auto 24px"}}),
+          h("div",{className:"serif",style:{fontSize:20,fontWeight:300,color:"var(--text-2)",fontStyle:"italic"}},"Aucune donnée"),
+          h("div",{style:{fontSize:12,color:"var(--text-3)",marginTop:8}},"Enregistre une séance pour voir ta courbe")):
+        h("div",null,
+          // Toggle
+          h("div",{style:{padding:"0 24px",marginBottom:24}},
+            h("div",{style:{display:"flex",gap:4,padding:4,background:"var(--surface)",border:"1px solid var(--line)",borderRadius:12}},
+              [["max","Charge max"],["vol","Volume total"]].map(function(m){
+                var active=chartMode===m[0];
+                return h("button",{key:m[0],onClick:function(){setChartMode(m[0])},style:{flex:1,padding:"10px",borderRadius:9,background:active?"var(--accent-dim)":"transparent",border:active?"1px solid var(--accent-line)":"1px solid transparent",color:active?"var(--accent)":"var(--text-3)",fontSize:12,fontWeight:500,letterSpacing:"0.04em",transition:"all 0.2s"}},m[1])
+              }))),
+
+          // Big current value + delta
+          h("div",{style:{padding:"0 24px",marginBottom:8}},
+            h("div",{style:{display:"flex",alignItems:"baseline",gap:12}},
+              h("div",{className:"serif",style:{fontSize:48,fontWeight:300,letterSpacing:"-0.04em",lineHeight:1}},
+                chartMode==="max"?last:(last>=1000?(last/1000).toFixed(1)+"k":last),
+                h("span",{style:{fontSize:15,color:"var(--text-3)",marginLeft:8,fontStyle:"italic"}},chartMode==="max"?"lbs":"lbs·vol")),
+              pts.length>1&&delta!==0?h("div",{style:{fontSize:13,fontFamily:"'JetBrains Mono',monospace",color:delta>0?"var(--green)":"var(--red)",letterSpacing:"0.02em"}},
+                (delta>0?"+":"")+(chartMode==="max"?delta:(Math.abs(delta)>=1000?(delta/1000).toFixed(1)+"k":delta))+" ("+(deltaPct>0?"+":"")+deltaPct+"%)"):null),
+            h("div",{className:"label",style:{marginTop:6}},chartMode==="max"?"Charge maximale actuelle":"Volume total actuel · charge × reps")),
+
+          // Chart
+          h("div",{style:{padding:"24px 16px 8px"}},
+            h("svg",{viewBox:"0 0 "+W+" "+H,style:{width:"100%",height:"auto",overflow:"visible"}},
+              // gridlines
+              [0,0.25,0.5,0.75,1].map(function(g,gi){
+                var gy=padY+plotH*g;
+                return h("line",{key:gi,x1:padX,y1:gy,x2:W-padX,y2:gy,stroke:"rgba(255,255,255,0.04)",strokeWidth:1})
+              }),
+              // area fill
+              areaPath?h("path",{d:areaPath,fill:"url(#gr)",opacity:0.5}):null,
+              h("defs",null,h("linearGradient",{id:"gr",x1:"0",y1:"0",x2:"0",y2:"1"},
+                h("stop",{offset:"0%",stopColor:"#D4C5A0",stopOpacity:0.18}),
+                h("stop",{offset:"100%",stopColor:"#D4C5A0",stopOpacity:0}))),
+              // line
+              linePath?h("path",{d:linePath,fill:"none",stroke:"#D4C5A0",strokeWidth:1.5,strokeLinecap:"round",strokeLinejoin:"round"}):null,
+              // points
+              pts.map(function(p,i){
+                var v=chartMode==="max"?p.max:p.vol;
+                var x=xAt(i),y=yAt(v);
+                return h("g",{key:i},
+                  h("circle",{cx:x,cy:y,r:p.cur?4:2.5,fill:p.cur?"#D4C5A0":"var(--bg)",stroke:"#D4C5A0",strokeWidth:1.5}),
+                  p.cur?h("circle",{cx:x,cy:y,r:8,fill:"none",stroke:"#D4C5A0",strokeWidth:1,opacity:0.3}):null)
+              }))),
+
+          // X axis labels
+          h("div",{style:{padding:"0 24px",display:"flex",justifyContent:"space-between",marginBottom:32}},
+            pts.length>0?h("div",{className:"mono",style:{fontSize:9,color:"var(--text-4)"}},"S"+pts[0].week):null,
+            pts.length>2?h("div",{className:"mono",style:{fontSize:9,color:"var(--text-4)"}},"S"+pts[Math.floor(pts.length/2)].week):null,
+            pts.length>1?h("div",{className:"mono",style:{fontSize:9,color:"var(--accent)"}},"S"+pts[pts.length-1].week+" · actuel"):null),
+
+          // Detailed breakdown per week (newest first)
+          h("div",{style:{padding:"0 24px"}},
+            h("div",{style:{display:"flex",alignItems:"baseline",gap:12,marginBottom:8}},
+              h("div",{className:"label"},"Détail par semaine"),
+              h("div",{style:{flex:1,height:1,background:"var(--line)"}})),
+            hist.map(function(hh,i){
+              var bw=Math.max.apply(null,hh.sets.map(function(s){return parseFloat(s.weight)||0}));
+              var vv=hh.sets.reduce(function(a,s){return a+(parseFloat(s.weight)||0)*(parseFloat(s.reps)||0)},0);
+              return h("div",{key:i,style:{padding:"18px 0",borderBottom:i<hist.length-1?"1px solid var(--line)":"none"}},
+                h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:12}},
+                  h("div",{className:"label",style:{color:hh.cur?"var(--accent)":"var(--text-3)"}},hh.cur?"Cette semaine":"Semaine "+hh.week),
+                  h("div",{className:"mono",style:{fontSize:13,color:"var(--text-2)"}},
+                    h("span",{style:{color:"var(--text)",fontWeight:500}},bw),h("span",{style:{color:"var(--text-4)"}}," lbs · "),
+                    h("span",{style:{color:"var(--text)",fontWeight:500}},vv>=1000?(vv/1000).toFixed(1)+"k":vv),h("span",{style:{color:"var(--text-4)"}}," vol"))),
+                h("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},hh.sets.map(function(s,j){
+                  return h("div",{key:j,className:"mono",style:{fontSize:12,padding:"6px 10px",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:6,color:"var(--text-2)"}},
+                    h("span",{style:{color:"var(--text-4)"}},String(s.set).padStart(2,"0"))," ",
+                    h("span",{style:{color:"var(--text)",fontWeight:500}},s.weight),h("span",{style:{color:"var(--text-3)"}}," · "),s.reps)
+                })))
+            }))))
+  }
+
+  // WORKOUT
+  if(view==="workout"&&selDay!==null){
+    var day=DAYS[selDay],isT=selDay===td;
+
+    if(day.type==="hiit"){var dn=hD(selDay);return h("div",{style:{minHeight:"100vh",background:"var(--bg)"}},h(Toast),
+      h("div",{style:{padding:"24px"}},h("button",{onClick:function(){setView("home");setSelDay(null)},style:{color:"var(--text-2)"}},h(Ic,{i:"back",s:20}))),
+      h("div",{style:{padding:"40px 32px",textAlign:"center"}},
+        h("div",{className:"eyebrow",style:{color:"var(--accent)"}},"Mercredi"),
+        h("div",{className:"serif",style:{fontSize:44,fontWeight:300,letterSpacing:"-0.04em",lineHeight:1,marginTop:16}},"Spinning"),
+        h("div",{className:"serif",style:{fontSize:44,fontWeight:300,fontStyle:"italic",letterSpacing:"-0.04em",lineHeight:1,color:"var(--accent)"}},"Intervals"),
+        h("div",{style:{width:24,height:1,background:"var(--accent)",margin:"32px auto"}}),
+        h("div",{style:{fontSize:14,color:"var(--text-2)",lineHeight:1.8,marginBottom:48,fontWeight:300}},"45 min · 116 BPM cible",h("br"),"Repas 2–3h avant · Hydratation++"),
+        dn?h("div",{style:{display:"inline-flex",alignItems:"center",gap:10,color:"var(--green)",fontSize:13,letterSpacing:"0.04em"}},h("span",{style:{width:6,height:6,background:"var(--green)",borderRadius:"50%"}}),"Séance complétée"):
+          h("button",{onClick:function(){doH(selDay)},style:{padding:"16px 48px",background:"var(--accent)",color:"#000",borderRadius:100,fontSize:13,fontWeight:500,letterSpacing:"0.08em",textTransform:"uppercase"}},"Marquer complété")))}
+
+    if(day.type==="repos")return h("div",{style:{minHeight:"100vh",background:"var(--bg)"}},
+      h("div",{style:{padding:"24px"}},h("button",{onClick:function(){setView("home");setSelDay(null)},style:{color:"var(--text-2)"}},h(Ic,{i:"back",s:20}))),
+      h("div",{style:{padding:"40px 32px",textAlign:"center"}},
+        h("div",{className:"eyebrow",style:{color:"var(--text-3)"}},selDay===5?"Samedi":"Dimanche"),
+        h("div",{className:"serif",style:{fontSize:44,fontWeight:300,fontStyle:"italic",letterSpacing:"-0.04em",lineHeight:1,marginTop:16}},selDay===5?"Recovery":"Rest"),
+        h("div",{style:{width:1,height:40,background:"var(--line)",margin:"40px auto"}}),
+        h("div",{style:{fontSize:14,color:"var(--text-2)",lineHeight:2.2,fontWeight:300}},
+          selDay===5?h(React.Fragment,null,"Marche 20 min",h("br"),"Jeûne 24h",h("br"),"Mobilité 15 min",h("br"),"4L eau + électrolytes"):
+            h(React.Fragment,null,"Repos complet",h("br"),"Marche 20 min",h("br"),"Sommeil 7–9h",h("br"),"16/8 reprise à midi"))));
+
+    var totalSets=day.ex.reduce(function(a,e){return a+e.sets},0);
+    return h("div",{style:{minHeight:"100vh",background:"var(--bg)",paddingBottom:120}},h(Toast),
+      h("div",{style:{padding:"20px 24px",position:"sticky",top:0,background:"var(--bg)",zIndex:10,borderBottom:"1px solid var(--line)"}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
+          h("button",{onClick:function(){setView("home");setSelDay(null)},style:{color:"var(--text-2)"}},h(Ic,{i:"back",s:20})),
+          isD(selDay)?h("div",{style:{display:"flex",alignItems:"center",gap:8,fontSize:11,color:"var(--green)",letterSpacing:"0.06em"}},h("span",{style:{width:5,height:5,background:"var(--green)",borderRadius:"50%"}}),"COMPLÉTÉ"):
+            h("div",{className:"mono",style:{fontSize:11,color:"var(--text-3)"}},"SEM "+wi.split("-")[0].slice(1)))),
+      
+      h("div",{className:"stagger-1",style:{padding:"32px 24px 24px"}},
+        h("div",{className:"eyebrow",style:{color:"var(--accent)"}},isT?"Aujourd'hui":day.label),
+        h("div",{className:"serif",style:{fontSize:44,fontWeight:300,letterSpacing:"-0.04em",lineHeight:1,marginTop:8}},day.name.split(" ")[0]),
+        h("div",{className:"serif",style:{fontSize:44,fontWeight:300,fontStyle:"italic",letterSpacing:"-0.04em",lineHeight:1,color:"var(--accent)"}},day.name.split(" ")[1]||""),
+        h("div",{style:{display:"flex",gap:32,marginTop:24,paddingTop:20,borderTop:"1px solid var(--line)"}},
+          h("div",null,h("div",{className:"mono",style:{fontSize:24,fontWeight:400,letterSpacing:"-0.02em"}},day.ex.length),h("div",{className:"label",style:{marginTop:2}},"Mouvements")),
+          h("div",null,h("div",{className:"mono",style:{fontSize:24,fontWeight:400,letterSpacing:"-0.02em"}},totalSets),h("div",{className:"label",style:{marginTop:2}},"Séries")),
+          h("div",null,h("div",{className:"mono",style:{fontSize:24,fontWeight:400,letterSpacing:"-0.02em"}},"~60m"),h("div",{className:"label",style:{marginTop:2}},"Durée")))),
+
+      h("div",{style:{padding:"0 24px"}},
+        day.ex.map(function(ex,ei){
+          var sets=[];for(var i=0;i<ex.sets;i++)sets.push(i);
+          var s1w=gv(ex.id,0,"w"),s1r=gv(ex.id,0,"r");
+          var af=sets.some(function(s){return gv(ex.id,s,"w")||gv(ex.id,s,"r")});
+          var pS0=gP(selDay,ex.id,0);
+          return h("div",{key:ex.id,className:"stagger-"+Math.min(ei+2,7),style:{paddingTop:24,paddingBottom:24,borderBottom:"1px solid var(--line)"}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:16,marginBottom:20}},
+              h("div",{style:{flex:1}},
+                h("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:6}},
+                  h("div",{className:"mono",style:{fontSize:11,color:"var(--text-4)"}},String(ei+1).padStart(2,"0")),
+                  h("div",{style:{width:8,height:1,background:af?"var(--accent)":"var(--text-4)"}})),
+                h("div",{className:"serif",style:{fontSize:22,fontWeight:400,letterSpacing:"-0.02em",lineHeight:1.15}},ex.name),
+                h("div",{style:{display:"flex",gap:10,marginTop:8,alignItems:"center",flexWrap:"wrap"}},
+                  h("span",{className:"label",style:{color:"var(--text-2)"}},ex.cat),
+                  h("span",{style:{color:"var(--text-4)",fontSize:10}},"•"),
+                  h("span",{className:"mono",style:{fontSize:11,color:"var(--text-3)",letterSpacing:"0.02em"}},ex.sets+"×"+ex.reps),
+                  h("span",{style:{color:"var(--text-4)",fontSize:10}},"•"),
+                  h("span",{className:"serif",style:{fontSize:12,fontStyle:"italic",color:"var(--text-3)",fontWeight:300}},ex.note))),
+              h("button",{onClick:function(){setHEx({di:selDay,ex:ex});setView("history")},style:{color:"var(--text-3)",padding:4}},h(Ic,{i:"chart",s:16}))),
+
+            h("div",{style:{marginBottom:20}},h(Timer,{sec:ex.rest,label:ex.rl})),
+
+            pS0?h("div",{style:{marginBottom:16,padding:"10px 14px",background:"var(--surface-2)",border:"1px solid var(--line)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"space-between"}},
+              h("div",{className:"label",style:{fontSize:9}},"Sem. passée"),
+              h("div",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},sets.map(function(s){var p=gP(selDay,ex.id,s);return p?(p.weight+"·"+p.reps):null}).filter(Boolean).join("  "))):null,
+
+            h("div",null,
+              h("div",{style:{display:"grid",gridTemplateColumns:"24px 1fr 1fr",gap:10,paddingBottom:10,borderBottom:"1px solid var(--line)"}},
+                h("div",{className:"label",style:{fontSize:9,textAlign:"center"}},"#"),
+                h("div",{className:"label",style:{fontSize:9}},"Charge"),
+                h("div",{className:"label",style:{fontSize:9}},"Reps")),
+              sets.map(function(s){
+                var prev=gP(selDay,ex.id,s),w=gv(ex.id,s,"w"),r=gv(ex.id,s,"r"),fl2=w||r;
+                var ist={background:"transparent",border:"none",borderBottom:"1px solid "+(fl2?"var(--accent-line)":"var(--line)"),color:fl2?"var(--text)":"var(--text-2)",padding:"12px 2px",fontSize:17,fontFamily:"'JetBrains Mono',monospace",fontWeight:400,outline:"none",width:"100%",letterSpacing:"-0.01em"};
+                return h("div",{key:s,style:{display:"grid",gridTemplateColumns:"24px 1fr 1fr",gap:10,alignItems:"center"}},
+                  h("div",{className:"mono",style:{fontSize:12,fontWeight:500,color:fl2?"var(--accent)":"var(--text-4)",textAlign:"center"}},String(s+1).padStart(2,"0")),
+                  h("input",{type:"number",inputMode:"decimal",placeholder:prev?String(prev.weight):"—",value:w,onChange:function(e){sv2(ex.id,s,"w",e.target.value)},style:ist}),
+                  h("input",{type:"number",inputMode:"numeric",placeholder:prev?String(prev.reps):"—",value:r,onChange:function(e){sv2(ex.id,s,"r",e.target.value)},style:ist}))}),
+              (s1w||s1r)?h("button",{onClick:function(){aAll(ex.id,ex.sets)},style:{marginTop:16,width:"100%",padding:"12px",border:"1px dashed var(--accent-line)",borderRadius:10,color:"var(--accent)",fontSize:11,letterSpacing:"0.06em",textTransform:"uppercase",fontWeight:500}},"Appliquer S1 à toutes les séries"):null))
+        })),
+
+      h("div",{style:{position:"fixed",bottom:0,left:0,right:0,padding:"16px 24px",paddingBottom:"calc(16px + env(safe-area-inset-bottom, 24px))",background:"linear-gradient(to top, var(--bg) 60%, transparent)",zIndex:20}},
+        h("button",{onClick:function(){saveWk(selDay)},style:{width:"100%",padding:"18px",background:"var(--accent)",color:"#0A0A0A",borderRadius:100,fontSize:12,fontWeight:600,letterSpacing:"0.12em",textTransform:"uppercase"}},"Enregistrer la séance")))
+  }
+
+  // HOME
+  var prog=wp(),tDay=DAYS[td];
+  var dateStr=new Date().toLocaleDateString("fr-CA",{weekday:"long",day:"numeric",month:"long"});
+  
+  return h("div",{style:{minHeight:"100vh",background:"var(--bg)",paddingBottom:40}},h(Toast),
+    h("div",{className:"stagger-1",style:{padding:"32px 24px 0"}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:40}},
+        h("div",{className:"mono",style:{fontSize:10,letterSpacing:"0.15em",color:"var(--text-3)",textTransform:"uppercase"}},dateStr.replace(/^./,function(c){return c.toUpperCase()})),
+        h("div",{className:"mono",style:{fontSize:10,letterSpacing:"0.15em",color:"var(--text-3)"}},"SEM "+wi.split("-")[0].slice(1))),
+      h("div",{style:{marginBottom:8}},
+        h("div",{className:"serif",style:{fontSize:72,fontWeight:300,letterSpacing:"-0.05em",lineHeight:0.9}},"Recomp."),
+        h("div",{className:"serif",style:{fontSize:20,fontWeight:300,fontStyle:"italic",letterSpacing:"-0.02em",color:"var(--accent)",marginTop:8}},"A quiet transformation.")),
+      h("div",{style:{display:"flex",alignItems:"center",gap:12,marginTop:32,paddingTop:24,borderTop:"1px solid var(--line)"}},
+        h("div",{className:"mono",style:{fontSize:11,color:"var(--text-2)"}},"110"),
+        h("div",{style:{width:16,height:1,background:"var(--text-4)"}}),
+        h("div",{className:"mono",style:{fontSize:11,color:"var(--accent)"}},"85 kg"),
+        h("div",{style:{flex:1}}),
+        h("div",{className:"mono",style:{fontSize:11,color:"var(--text-3)",letterSpacing:"0.05em"}},"CH · I"))),
+
+    h("div",{className:"stagger-2",style:{padding:"40px 24px 0"}},
+      h("div",{style:{display:"flex",alignItems:"baseline",justifyContent:"space-between",marginBottom:12}},
+        h("div",{className:"label"},"Progression"),
+        h("div",{className:"mono",style:{fontSize:13,letterSpacing:"-0.01em"}},prog,h("span",{style:{color:"var(--text-4)"}},"/5"))),
+      h("div",{style:{display:"flex",gap:4,height:2}},
+        [0,1,2,3,4].map(function(i){return h("div",{key:i,style:{flex:1,background:i<prog?"var(--accent)":"var(--line)",transition:"background 0.5s"}})}))),
+
+    h("div",{className:"stagger-3",style:{padding:"40px 24px 0"}},
+      h("div",{className:"label",style:{marginBottom:16}},"Cette semaine"),
+      h("div",{style:{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:6}},DAYS.map(function(d,i){
+        var iT=i===td,dn=d.type==="muscu"?isD(i):d.type==="hiit"?hD(i):false;
+        var lbl=d.type==="muscu"?d.name.replace("Upper","U").replace("Lower","L"):d.type==="hiit"?"HIIT":"—";
+        return h("button",{key:d.id,onClick:function(){setSelDay(i);setView("workout")},style:{padding:"14px 4px",background:iT?"var(--accent-dim)":"transparent",border:iT?"1px solid var(--accent-line)":"1px solid var(--line)",borderRadius:10,display:"flex",flexDirection:"column",alignItems:"center",gap:6,position:"relative",transition:"all 0.2s"}},
+          h("div",{className:"mono",style:{fontSize:9,color:iT?"var(--accent)":"var(--text-3)",letterSpacing:"0.08em"}},d.label.slice(0,3).toUpperCase()),
+          h("div",{style:{width:4,height:4,borderRadius:"50%",background:dn?"var(--green)":iT?"var(--accent)":"var(--text-4)"}}),
+          h("div",{style:{fontSize:9,color:iT?"var(--text)":"var(--text-3)",fontWeight:500}},lbl))}))),
+
+    h("div",{className:"stagger-4",style:{padding:"40px 24px 0"}},
+      h("button",{onClick:function(){setSelDay(td);setView("workout")},style:{width:"100%",textAlign:"left",padding:"28px 24px",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:20,position:"relative",overflow:"hidden"}},
+        h("div",{className:"serif",style:{position:"absolute",right:-20,top:-20,fontSize:200,fontWeight:300,color:"var(--surface-2)",lineHeight:1,pointerEvents:"none",userSelect:"none"}},"0"+(td+1)),
+        h("div",{style:{position:"relative",zIndex:1}},
+          h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:16}},
+            h("span",{style:{width:4,height:4,background:"var(--accent)",borderRadius:"50%",animation:"dotPulse 2s infinite"}}),
+            h("div",{className:"eyebrow",style:{color:"var(--accent)"}},"En cours · Aujourd'hui")),
+          h("div",{className:"serif",style:{fontSize:36,fontWeight:300,letterSpacing:"-0.03em",lineHeight:1}},tDay.name.split(" ")[0]," ",h("span",{style:{fontStyle:"italic",color:"var(--accent)"}},tDay.name.split(" ")[1]||"")),
+          h("div",{className:"serif",style:{fontSize:14,fontStyle:"italic",color:"var(--text-3)",fontWeight:300,marginTop:6}},tDay.sub),
+          tDay.type==="muscu"?h("div",{style:{display:"flex",gap:20,marginTop:20,paddingTop:20,borderTop:"1px solid var(--line)"}},
+            h("div",null,h("div",{className:"mono",style:{fontSize:18,fontWeight:400,letterSpacing:"-0.02em"}},tDay.ex.length),h("div",{className:"label",style:{marginTop:2,fontSize:9}},"Mvts")),
+            h("div",null,h("div",{className:"mono",style:{fontSize:18,fontWeight:400,letterSpacing:"-0.02em"}},tDay.ex.reduce(function(a,e){return a+e.sets},0)),h("div",{className:"label",style:{marginTop:2,fontSize:9}},"Séries")),
+            h("div",{style:{flex:1,display:"flex",justifyContent:"flex-end",alignItems:"center",color:"var(--accent)"}},h(Ic,{i:"arrow",s:18}))
+          ):null))),
+
+    h("div",{className:"stagger-5",style:{padding:"40px 24px 0",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
+      h("div",{style:{padding:"20px",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16}},
+        h("div",{className:"label",style:{marginBottom:16}},"Hydratation"),
+        h("div",{style:{display:"flex",alignItems:"baseline",gap:4,marginBottom:6}},
+          h("div",{className:"serif",style:{fontSize:32,fontWeight:400,letterSpacing:"-0.03em",color:wPc>=100?"var(--green)":"var(--text)"}},wL.toFixed(1)),
+          h("div",{className:"mono",style:{fontSize:11,color:"var(--text-3)"}},"/"+wTgt+"L")),
+        h("div",{style:{height:1,background:"var(--line)",position:"relative",marginBottom:14}},h("div",{style:{position:"absolute",inset:0,background:wPc>=100?"var(--green)":"var(--accent)",width:wPc+"%",transition:"width 0.4s"}})),
+        h("div",{style:{display:"flex",gap:6}},
+          h("button",{onClick:function(){doW(-1)},style:{flex:1,padding:8,border:"1px solid var(--line)",borderRadius:8,color:"var(--text-2)",display:"flex",alignItems:"center",justifyContent:"center"}},h(Ic,{i:"minus",s:12})),
+          h("button",{onClick:function(){doW(1)},style:{flex:1,padding:8,background:"var(--accent-dim)",border:"1px solid var(--accent-line)",borderRadius:8,color:"var(--accent)",display:"flex",alignItems:"center",justifyContent:"center"}},h(Ic,{i:"plus",s:12})))),
+      h("div",{style:{padding:"20px",background:"var(--surface)",border:"1px solid var(--line)",borderRadius:16}},
+        h("div",{className:"label",style:{marginBottom:16}},"Jeûne"),
+        h("div",{className:"serif",style:{fontSize:32,fontWeight:400,letterSpacing:"-0.03em",lineHeight:1,color:fast?"var(--green)":"var(--text)"}},td===5?"24h":"16:8"),
+        h("div",{className:"serif",style:{fontSize:12,fontStyle:"italic",color:"var(--text-3)",fontWeight:300,marginTop:4,marginBottom:18}},td===5?"Prolongé":"12h – 20h"),
+        h("button",{onClick:doF,style:{width:"100%",padding:10,background:fast?"rgba(127,182,133,0.1)":"var(--accent-dim)",border:"1px solid "+(fast?"rgba(127,182,133,0.25)":"var(--accent-line)"),borderRadius:8,color:fast?"var(--green)":"var(--accent)",fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",fontWeight:600}},fast?"✓ Complété":"Marquer"))),
+
+    h("div",{className:"stagger-6",style:{padding:"40px 24px 0"}},
+      h("div",{className:"label",style:{marginBottom:20}},"Objectifs quotidiens"),
+      h("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",borderTop:"1px solid var(--line)",borderBottom:"1px solid var(--line)"}},
+        [["150","g prot"],["3","repas"],["116","bpm"],["20","min"]].map(function(p,i){
+          return h("div",{key:i,style:{padding:"20px 8px",textAlign:"center",borderRight:i<3?"1px solid var(--line)":"none"}},
+            h("div",{className:"serif",style:{fontSize:28,fontWeight:400,letterSpacing:"-0.03em",lineHeight:1}},p[0]),
+            h("div",{className:"label",style:{marginTop:6,fontSize:9}},p[1]))
+        }))),
+
+    h("div",{className:"stagger-7",style:{padding:"40px 24px 0"}},
+      h("div",{style:{display:"flex",alignItems:"baseline",gap:12,marginBottom:20}},
+        h("div",{className:"label"},"Protocole"),
+        h("div",{style:{flex:1,height:1,background:"var(--line)"}})),
+      [["I.","Entraînement","4 muscu · Upper A → Lower A → Upper B → Lower B"],
+       ["II.","Cardio","1 spinning intervals · mercredi · CHR 116"],
+       ["III.","Jeûne","16:8 quotidien · 24h le samedi"],
+       ["IV.","Marche","20 min 7/7 · incline 12–14%"],
+       ["V.","Hydratation","3.5–4.5L · +électrolytes jour jeûne"]].map(function(r,i){
+        return h("div",{key:i,style:{display:"flex",gap:16,padding:"18px 0",borderBottom:i<4?"1px solid var(--line)":"none",alignItems:"baseline"}},
+          h("div",{className:"mono",style:{fontSize:11,color:"var(--accent)",minWidth:28,letterSpacing:"0.05em"}},r[0]),
+          h("div",{style:{flex:1}},
+            h("div",{className:"serif",style:{fontSize:17,fontWeight:400,letterSpacing:"-0.02em"}},r[1]),
+            h("div",{style:{fontSize:12,color:"var(--text-3)",marginTop:4,fontWeight:300}},r[2])))
+      })),
+
+    h("div",{style:{padding:"24px 24px 8px"}},
+      h("div",{style:{padding:"24px",background:"var(--accent-dim)",border:"1px solid var(--accent-line)",borderRadius:18}},
+        h("div",{style:{display:"flex",alignItems:"baseline",gap:12,marginBottom:14}},
+          h("div",{className:"label",style:{color:"var(--accent)"}},"Progression"),
+          h("div",{style:{width:24,height:1,background:"var(--accent)"}})),
+        h("div",{className:"serif",style:{fontSize:15,fontWeight:400,lineHeight:1.6}},
+          "Haut de la fourchette → ",h("span",{className:"mono",style:{color:"var(--green)"}},"+5 lbs"),
+          h("span",{style:{color:"var(--text-3)"}}," upper"),
+          h("span",{className:"mono",style:{color:"var(--green)"}},", +10 lbs"),
+          h("span",{style:{color:"var(--text-3)"}}," lower")),
+        h("div",{className:"serif",style:{fontSize:13,fontStyle:"italic",color:"var(--text-3)",marginTop:10,fontWeight:300}},"Deload S5 · volume ÷ 2 · charges identiques"))),
+
+    h("div",{style:{padding:"40px 24px 16px",textAlign:"center"}},
+      h("div",{style:{width:24,height:1,background:"var(--line)",margin:"0 auto 16px"}}),
+      h("div",{className:"mono",style:{fontSize:9,letterSpacing:"0.2em",color:"var(--text-4)",textTransform:"uppercase"}},"Recomp · MMXXVI"))
+  )
+}
+
+ReactDOM.render(h(App),document.getElementById("root"));
+</script>
+</body>
+</html>
